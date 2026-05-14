@@ -1,0 +1,16 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+via_ir = true
+optimizer = true
+optimizer_runs = 4444
+bytecode_hash = "none"
+evm_version = "cancun"
+remappings = [
+    "@uniswap/v4-core=lib/v4-core/",
+    "@uniswap/v4-periphery=lib/v4-periphery/",
+]
+skip = ["./src/v4-core/test/**"]
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
