@@ -97,11 +97,7 @@ contract DeployV4Full is Script {
         // 3. PositionDescriptor
         // ---------------------------------------------------------------------
         bytes32 nativeLabelBytes = _toBytes32(NATIVE_LABEL);
-        positionDescriptor = new PositionDescriptor(
-            IPoolManager(address(poolManager)),
-            weth9,
-            nativeLabelBytes
-        );
+        positionDescriptor = new PositionDescriptor(IPoolManager(address(poolManager)), weth9, nativeLabelBytes);
         console2.log("PositionDescriptor   :", address(positionDescriptor));
 
         // ---------------------------------------------------------------------
