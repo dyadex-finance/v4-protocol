@@ -14,7 +14,8 @@ import {V4Quoter} from "@uniswap/v4-periphery/src/lens/V4Quoter.sol";
 import {StateView} from "@uniswap/v4-periphery/src/lens/StateView.sol";
 
 import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol";
-import {DeployPermit2} from "permit2/test/utils/DeployPermit2.sol";
+
+bytes32 constant SALT = bytes32(uint256(0x0000000000000000000000000000000000000000d3af2663da51c10215000000));
 
 /// @notice Deploy the full Uniswap V4 protocol stack to a new EVM chain.
 ///
@@ -76,14 +77,13 @@ contract DeployV4 is Script {
         // ---------------------------------------------------------------------
         // 1. Permit2
         // ---------------------------------------------------------------------
-        if (PERMIT2_CANONICAL != address(0) && PERMIT2_CANONICAL.code.length > 0) {
+        if (PERMIT2_CANONICAL != address(0)) {
             permit2 = PERMIT2_CANONICAL;
-            console2.log("Permit2 (existing)   :", permit2);
+            console2.log("Using canonical Permit2:", permit2);
         } else {
-            permit2 = address(new DeployPermit2().deployPermit2());
-            console2.log("Permit2 (deployed)   :", permit2);
+            permit2 = vm.envAddress("PERMIT2_ADDRESS");
+            console2.log("Using deployed Permit2:", permit2);
         }
-
         // ---------------------------------------------------------------------
         // 2. PoolManager
         // ---------------------------------------------------------------------
@@ -101,13 +101,15 @@ contract DeployV4 is Script {
         // 4. PositionManager
         //    unsubscribeGasLimit of 300_000 matches the canonical mainnet value.
         // ---------------------------------------------------------------------
-        positionManager = address(new PositionManager(
-            IPoolManager(poolManager),
-            IAllowanceTransfer(permit2),
-            300_000,
-            IPositionDescriptor(positionDescriptor),
-            IWETH9(weth9)
-        ));
+        positionManager = address(
+            new PositionManager(
+                IPoolManager(poolManager),
+                IAllowanceTransfer(permit2),
+                300_000,
+                IPositionDescriptor(positionDescriptor),
+                IWETH9(weth9)
+            )
+        );
         console2.log("PositionManager      :", positionManager);
 
         // ---------------------------------------------------------------------
